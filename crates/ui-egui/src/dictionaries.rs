@@ -149,14 +149,19 @@ pub fn poll(app: &mut WordApp) {
 }
 
 /// Fetch `url` with the system's `curl`: HTTPS only, failing on HTTP errors, size- and
-/// time-capped.
+/// time-capped. On Windows it starts without a console window (the app uses the GUI subsystem).
 #[cfg(not(target_arch = "wasm32"))]
 fn curl(url: &str) -> Result<Vec<u8>, String> {
     let max = libreoffice::MAX_FILE.to_string();
-    let out = std::process::Command::new("curl")
-        .args(["--fail", "--silent", "--show-error", "--location", "--proto", "=https", "--max-time", "300", "--max-filesize", &max, url])
-        .output()
-        .map_err(|e| format!("curl isn't available ({e})"))?;
+    let mut cmd = std::process::Command::new("curl");
+    cmd.args(["--fail", "--silent", "--show-error", "--location", "--proto", "=https", "--max-time", "300", "--max-filesize", &max, url]);
+    #[cfg(target_os = "windows")]
+    {
+        /// Win32 `CREATE_NO_WINDOW` process creation flag.
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        std::os::windows::process::CommandExt::creation_flags(&mut cmd, CREATE_NO_WINDOW);
+    }
+    let out = cmd.output().map_err(|e| format!("curl isn't available ({e})"))?;
     if !out.status.success() {
         let err = String::from_utf8_lossy(&out.stderr);
         return Err(format!("{url}: {}", err.trim()));

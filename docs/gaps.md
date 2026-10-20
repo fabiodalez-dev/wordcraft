@@ -205,7 +205,7 @@ Footer page-table height and body wrapping are corrected. Other pagination gaps 
 | 2026-10-14 | trivial | Field report: grouped `flowChartOr` omitted its crossing spokes; the preset now draws them; wider DOCX corpus work remains open |
 | 2026-10-14 | trivial | Floating-table overlap checks use visible line content; empty line-break lines no longer move a table |
 | 2026-10-15 | trivial | #12: Ink to Shape pairs a line with a separately drawn V or closed-triangle head, and recognises one-stroke arrows with a closed triangle head |
-| 2026-10-15 | trivial | #8: File › Options › Proofing › Dictionaries puts a Download button beside Polish, Portuguese, Italian, Russian and Czech when they have no dictionary; it fetches the pair from LibreOffice's dictionary collection into the dictionaries folder (`ui.dictionaries.download`). The Language pane's Proofing language note no longer claims every text is checked in English |
+| 2026-10-20 | trivial | #8: File › Options › Proofing › Dictionaries puts a Download button beside Polish, Portuguese, Italian, Russian and Czech when they have no dictionary; it fetches the pair from LibreOffice's dictionary collection into the dictionaries folder (`ui.dictionaries.download`). The Language pane's Proofing language note no longer claims every text is checked in English |
 | 2026-10-13 | trivial | Gap #3: Behind Text pictures and shapes drag over text in the body and headers, selected or not; a click without movement still edits the text |
 | 2026-10-13 | trivial | Row 1: the watermark is saved to DOCX headers (#1290) |
 | 2026-10-13 | trivial | Row 1: Word's text watermark in DOCX headers is drawn (#1290) |

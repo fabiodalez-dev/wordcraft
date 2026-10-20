@@ -142,13 +142,27 @@ pub fn install(dir: &Path, source: &Source, aff: &[u8], dic: &[u8]) -> Result<Pa
     std::fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
     let aff_path = dir.join(format!("{}.aff", source.name));
     let dic_path = dir.join(format!("{}.dic", source.name));
-    for (bytes, path) in [(aff, &aff_path), (dic, &dic_path)] {
-        let mut part = path.clone().into_os_string();
-        part.push(".part");
-        let part = PathBuf::from(part);
-        std::fs::write(&part, bytes).map_err(|e| format!("{}: {e}", part.display()))?;
-        if let Err(e) = std::fs::rename(&part, path) {
-            let _ = std::fs::remove_file(&part);
+    let part = |path: &Path| {
+        let mut p = path.as_os_str().to_owned();
+        p.push(".part");
+        PathBuf::from(p)
+    };
+    let (aff_part, dic_part) = (part(&aff_path), part(&dic_path));
+    let clean = || {
+        let _ = std::fs::remove_file(&aff_part);
+        let _ = std::fs::remove_file(&dic_part);
+    };
+    // Both files are written before either is renamed, so a failed write (a full disk) leaves
+    // an earlier pair untouched.
+    for (bytes, p) in [(aff, &aff_part), (dic, &dic_part)] {
+        if let Err(e) = std::fs::write(p, bytes) {
+            clean();
+            return Err(format!("{}: {e}", p.display()));
+        }
+    }
+    for (p, path) in [(&aff_part, &aff_path), (&dic_part, &dic_path)] {
+        if let Err(e) = std::fs::rename(p, path) {
+            clean();
             return Err(format!("{}: {e}", path.display()));
         }
     }
