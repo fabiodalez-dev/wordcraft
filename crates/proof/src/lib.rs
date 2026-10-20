@@ -205,6 +205,8 @@ pub fn dictionary_load_error(lang: ProofLang) -> Option<String> {
         ProofLang::Hr => "hr_HR",
         ProofLang::Tr => "tr_TR",
         ProofLang::Id => "id_ID",
+        ProofLang::Ru => "ru_RU",
+        ProofLang::Cs => "cs_CZ",
         _ => return None,
     };
     hunspell::load_error(key).map(|(_, reason)| reason)
@@ -989,6 +991,18 @@ mod tests {
     }
 
     use super::*;
+
+    /// Russian and Czech report why their dictionary didn't load, as the other Hunspell
+    /// languages do (File › Options › Proofing shows the reason).
+    #[test]
+    fn russian_and_czech_load_errors_are_reported() {
+        for (lang, key) in [(ProofLang::Ru, "ru_RU"), (ProofLang::Cs, "cs_CZ")] {
+            let _ = hunspell::note_load::<()>(key, std::path::Path::new("/nowhere/x.dic"), Err("FLAG long is not supported".into()));
+            assert_eq!(dictionary_load_error(lang).as_deref(), Some("FLAG long is not supported"), "{lang:?}");
+            hunspell::clear_load_error(key);
+            assert_eq!(dictionary_load_error(lang), None);
+        }
+    }
 
     /// #1063: the dictionaries folder is searched before the system locations; the dictionaries
     /// in it are reported and used, and cached checks are dropped. The folder holds the same test
