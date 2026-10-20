@@ -210,22 +210,20 @@ mod tests {
         assert_eq!(app.dictionaries.last.as_ref().unwrap()["error"], "offline");
         assert!(!dir.join("pt_BR.dic").exists());
 
+        // A well-formed pair that isn't the pinned LibreOffice file (a stand-in for a changed
+        // or tampered download) is refused by its checksum and nothing is saved.
         app.dictionaries.fetch = fake;
         app.run("ui.dictionaries.download", json!({"lang": "pt-BR"})).unwrap();
         assert!(app.run("ui.dictionaries.download", json!({"lang": "pt"})).is_err(), "one at a time");
         wait(&mut app);
-        assert!(dir.join("pt_BR.aff").is_file() && dir.join("pt_BR.dic").is_file());
-        // That folder isn't searched, so whether Portuguese is now found depends on the machine:
-        // check the outcome was not an error and the saved pair loads.
         let last = app.dictionaries.last.clone().unwrap();
-        assert!(last.get("error").is_none() && last["lang"] == "pt", "{last}");
+        assert!(last["lang"] == "pt" && last["error"].as_str().is_some_and(|e| e.contains("checksum")), "{last}");
+        assert!(!dir.join("pt_BR.aff").exists() && !dir.join("pt_BR.dic").exists());
         let st = app.run("ui.dictionaries", json!({})).unwrap();
         let pt = st["languages"].as_array().unwrap().iter().find(|l| l["lang"] == "pt").unwrap().clone();
         assert!(pt["installed"].is_boolean() && pt["downloading"] == false);
-        assert_eq!(pt["source"], "https://github.com/LibreOffice/dictionaries/tree/master/pt_BR");
-        let (aff, dic) = (dir.join("pt_BR.aff"), dir.join("pt_BR.dic"));
-        let d = wordcraft_engine::proof::hunspell::load(&aff, &dic).unwrap();
-        assert!(d.check("gatti") && !d.check("gatte"), "the saved pair loads");
+        let commit = wordcraft_engine::proof::libreoffice::COMMIT;
+        assert_eq!(pt["source"], format!("https://github.com/LibreOffice/dictionaries/tree/{commit}/pt_BR"));
 
         wordcraft_engine::proof::reload_dictionary(ProofLang::Pt);
         let _ = std::fs::remove_dir_all(&dir);
