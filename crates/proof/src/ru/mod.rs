@@ -102,11 +102,6 @@ pub fn installed_path() -> Option<std::path::PathBuf> {
     crate::hunspell::find(NAMES).map(|(_, dic)| dic)
 }
 
-/// The `.dic` file of the installed Russian dictionary, if there is one (looked up again).
-pub fn installed_path() -> Option<std::path::PathBuf> {
-    crate::hunspell::find(NAMES).map(|(_, dic)| dic)
-}
-
 /// Is a Russian dictionary available (spelling is checked)?
 pub fn has_dictionary() -> bool {
     !dictionary().is_empty()

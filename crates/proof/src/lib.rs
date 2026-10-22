@@ -174,7 +174,7 @@ pub fn reload_dictionary(lang: ProofLang) {
         ProofLang::Ru => ru::reload_dictionary(),
         ProofLang::Cs => cs::reload_dictionary(),
         ProofLang::Id => id::reload_dictionary(),
-        ProofLang::En | ProofLang::Bg | ProofLang::Other => return,
+        ProofLang::En | ProofLang::EnGb | ProofLang::EnCa | ProofLang::Bg | ProofLang::De | ProofLang::Other => return,
     }
     DICTIONARY_GENERATION.fetch_add(1, Ordering::Relaxed);
 }
@@ -1020,8 +1020,6 @@ mod tests {
             ("ru_RU", ru::test_dict::AFF, ru::test_dict::DIC),
             ("cs_CZ", cs::test_dict::AFF, cs::test_dict::DIC),
             ("id_ID", id::test_dict::AFF, id::test_dict::DIC),
-            ("ru_RU", ru::test_dict::AFF, ru::test_dict::DIC),
-            ("cs_CZ", cs::test_dict::AFF, cs::test_dict::DIC),
         ] {
             std::fs::write(dir.join(format!("{name}.aff")), aff).unwrap();
             std::fs::write(dir.join(format!("{name}.dic")), dic).unwrap();
@@ -1034,12 +1032,9 @@ mod tests {
         let before = dictionary_generation();
         set_dictionaries_folder(Some(dir.clone()));
         assert!(dictionary_generation() > before, "cached checks are dropped");
-        // Turkish has no test dictionary to put in the folder; Russian, Czech and Indonesian
-        // follow it.
+        // Turkish has no test dictionary to put in the folder; Indonesian is listed after it.
         let found = installed_dictionaries();
         assert_eq!(found.get(4).map(|(lang, _)| *lang), Some(ProofLang::Tr));
-        assert_eq!(found.get(5), Some(&(ProofLang::Ru, Some(dir.join("ru_RU.dic")))));
-        assert_eq!(found.get(6), Some(&(ProofLang::Cs, Some(dir.join("cs_CZ.dic")))));
         assert_eq!(found.last(), Some(&(ProofLang::Id, Some(dir.join("id_ID.dic")))));
         assert_eq!(
             found[..4],

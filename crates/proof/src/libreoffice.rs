@@ -99,7 +99,17 @@ pub fn source(lang: ProofLang) -> Option<Source> {
             "7ecb20620ecd46ebd9c36f3f33e69dd4eda385cba5b2bb4e6bc396d910e297f7",
             "d8e8c88c006fdae72dac8c85df11b0c99a773e05a4ab0fcbe92244876668ca74",
         ),
-        ProofLang::En | ProofLang::Hr | ProofLang::Tr | ProofLang::Id | ProofLang::Bg | ProofLang::Other => return None,
+        ProofLang::En
+        | ProofLang::EnGb
+        | ProofLang::EnCa
+        | ProofLang::Hr
+        | ProofLang::Tr
+        | ProofLang::Id
+        | ProofLang::Bg
+        | ProofLang::De
+        | ProofLang::Other => {
+            return None;
+        }
     };
     Some(Source { folder, name, aff_sha256, dic_sha256 })
 }
@@ -176,7 +186,8 @@ mod tests {
     #[test]
     fn the_languages_whose_collection_dictionary_loads_have_a_source() {
         for lang in ProofLang::PROOFED {
-            let expected = !matches!(lang, ProofLang::En | ProofLang::Hr | ProofLang::Tr | ProofLang::Id);
+            let expected =
+                !matches!(lang, ProofLang::En | ProofLang::EnGb | ProofLang::EnCa | ProofLang::Hr | ProofLang::Tr | ProofLang::Id | ProofLang::De);
             assert_eq!(source(lang).is_some(), expected, "{lang:?}");
         }
         assert_eq!(source(ProofLang::Other), None);
