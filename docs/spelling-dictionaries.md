@@ -56,7 +56,7 @@ The web version can't read these folders, so these languages aren't spell-checke
 
 ## Downloading one from WordCraft
 
-For Polish, Portuguese, Italian, Russian and Czech, **File › Options › Proofing › Dictionaries** shows a **Download** button beside a language with no dictionary. It fetches the pair from [LibreOffice's dictionary collection](https://github.com/LibreOffice/dictionaries) and saves it in the Dictionaries folder above, or, when none is set, in `dictionaries` in WordCraft's settings folder, which is always searched. Nothing is bundled: each dictionary keeps its own licence (GPL, LGPL or MPL) and stays a separate file that WordCraft only reads.
+For Polish, Portuguese, Italian, Russian and Czech, **File › Options › Proofing › Dictionaries** shows a **Download** button beside a language with no dictionary, or with one that can't be read. It fetches the pair from [LibreOffice's dictionary collection](https://github.com/LibreOffice/dictionaries) and saves it in the Dictionaries folder above, or, when none is set, in `dictionaries` in WordCraft's settings folder, which is always searched. Nothing is bundled: each dictionary keeps its own licence (GPL, LGPL or MPL) and stays a separate file that WordCraft only reads.
 
 The download is pinned. It comes from one fixed commit of the collection, and each file must match the SHA-256 WordCraft records for it (`crates/proof/src/libreoffice.rs`) before it is parsed or saved. A changed, truncated or tampered file is refused and nothing is written. Croatian, Turkish and Indonesian have no button yet: their collection dictionaries use `FLAG long` or `FLAG num`, which WordCraft doesn't read yet.
 

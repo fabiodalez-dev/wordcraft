@@ -373,7 +373,8 @@ fn dictionaries(app: &mut WordApp, ui: &mut Ui) {
                 (None, _) => crate::i18n::fmt(tl!("{language}: no dictionary found"), &[("language", language)]),
             };
             ui.add(egui::Label::new(RichText::new(line).small()).truncate());
-            if file.is_some() || !can_download || wordcraft_engine::proof::libreoffice::source(lang).is_none() {
+            // An unreadable pair can be replaced: the download goes to a folder searched first.
+            if (file.is_some() && error.is_none()) || !can_download || wordcraft_engine::proof::libreoffice::source(lang).is_none() {
                 return;
             }
             missing = true;
