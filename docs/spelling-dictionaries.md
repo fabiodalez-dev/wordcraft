@@ -43,8 +43,10 @@ The first folder holding a matching pair wins:
 1. The folder set in **File › Options › Proofing › Dictionaries folder**. This is the easiest
    way on every system, and it works for an app started from the Start menu, Finder or the Dock.
    The same pane lists the dictionary file each language found.
-2. The folder in the `WORDCRAFT_DICTIONARIES` environment variable.
-3. The system's usual places:
+2. `dictionaries` in WordCraft's settings folder, where a download goes when no Dictionaries
+   folder is set (see [Downloading one from WordCraft](#downloading-one-from-wordcraft)).
+3. The folder in the `WORDCRAFT_DICTIONARIES` environment variable.
+4. The system's usual places:
 
 | System | Folders |
 |---|---|
