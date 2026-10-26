@@ -125,7 +125,7 @@ pub fn has_dictionary(lang: ProofLang) -> bool {
     !dictionary(lang).is_empty()
 }
 
-/// Is `word` spelled correctly in `lang`, with Word's default options? Numbers, single letters,
+/// Is `word` spelled correctly in `lang`, with the default options? Numbers, single letters,
 /// short words in capitals (acronyms), words with digits and words in another script are
 /// accepted, and so is every word when `lang` has no dictionary. A hyphenated word is correct
 /// when the dictionary has it whole or has each part.
