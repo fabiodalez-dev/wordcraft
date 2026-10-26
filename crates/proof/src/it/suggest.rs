@@ -80,11 +80,11 @@ impl Collector<'_> {
         let mut words = Vec::new();
         let mut cost = cost;
         for part in cand.split(' ') {
-            if self.d.contains(part) {
+            if self.d.contains_suggestible(part) {
                 words.push(part.to_string());
             } else {
                 let c = capitalize(part);
-                if !self.d.contains(&c) {
+                if !self.d.contains_suggestible(&c) {
                     return;
                 }
                 words.push(c);
@@ -212,9 +212,9 @@ pub fn suggest_in(d: &AffixDict, word: &str, max: usize) -> Vec<String> {
     let chars: Vec<char> = input.chars().collect();
     let mut col = Collector { d, input: input.clone(), tested: HashSet::new(), found: HashMap::new(), seq: 0 };
     // 1. Letter case.
-    if d.contains(&input) && word != input {
+    if d.contains_suggestible(&input) && word != input {
         col.keep(input.clone(), COST_CASE);
-    } else if d.contains(&capitalize(&input)) && word != capitalize(&input) {
+    } else if d.contains_suggestible(&capitalize(&input)) && word != capitalize(&input) {
         col.keep(capitalize(&input), COST_CASE);
     }
     // 2. Accents and other MAP slips.
@@ -363,7 +363,7 @@ fn scan(col: &mut Collector, chars: &[char]) {
                 continue;
             }
             let dist = weighted_distance(&lf, chars, &related, limit);
-            if dist <= limit && lf.as_slice() != chars {
+            if dist <= limit && lf.as_slice() != chars && d.contains_suggestible(&form) {
                 col.keep(form, COST_SCAN + dist * 3);
             }
         }
@@ -393,6 +393,16 @@ mod tests {
         has("amilano", "a Milano");
         has("roma", "Roma");
         has("Caffe", "Caffè");
+    }
+
+    #[test]
+    fn nosuggest_words_are_never_offered() {
+        // `squola` → `scuola` by the built-in q/c confusion and `Squola` → `squola` by case are
+        // both skipped when the stem is NOSUGGEST; the word itself is still correct.
+        let d = AffixDict::from_hunspell("SET UTF-8\nTRY aeiou\nNOSUGGEST !\n", "2\nscuola/!\nsquola/!\n", &[]).unwrap();
+        assert!(d.contains("scuola"));
+        assert!(!suggest_in(&d, "squola", 5).contains(&"scuola".to_string()));
+        assert!(!suggest_in(&d, "Squola", 5).contains(&"squola".to_string()));
     }
 
     #[test]
